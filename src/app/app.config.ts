@@ -9,11 +9,8 @@ import { LoginComponent } from './modules/auth/components/login/login.component'
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter([
-      { path: 'login', component: LoginComponent },
-      { path: '', redirectTo: 'login', pathMatch: 'full' }
-    ]),
+    provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient() // <-- Añade este proveedor
+    provideHttpClient()
   ]
 };

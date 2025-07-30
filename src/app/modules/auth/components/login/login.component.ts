@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../../core/services/auth.service';
+import { Router } from '@angular/router';
+import { AuthService, LoginResponse } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         </div>
         <button type="submit">Ingresar</button>
         <p *ngIf="errorMessage" style="color: red">{{ errorMessage }}</p>
+        <p *ngIf="successMessage" style="color: green">{{ successMessage }}</p>
       </form>
     </div>
   `,
@@ -57,18 +59,35 @@ export class LoginComponent {
   username = '';
   password = '';
   errorMessage = '';
+  successMessage = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onSubmit() {
     this.authService.login(this.username, this.password).subscribe({
-      next: (response) => {
+      next: (response: LoginResponse) => {
         console.log('Login exitoso:', response);
-        // Aquí puedes redirigir o manejar el éxito
+        this.successMessage = response.mensaje;
+        this.errorMessage = '';
+        
+        // Guardar datos en localStorage
+        localStorage.setItem('userData', JSON.stringify({
+          nombre: response.nombreCompleto,
+          local: response.local,
+          almacen: response.almacen,
+          materiales: response.materiales
+        }));
+        
+        // Redirigir al dashboard
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('Error en login:', error);
         this.errorMessage = 'Usuario o contraseña incorrectos';
+        this.successMessage = '';
       }
     });
   }

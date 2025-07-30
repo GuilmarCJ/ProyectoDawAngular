@@ -1,5 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+// Define la interfaz para la respuesta del login
+export interface LoginResponse {
+  mensaje: string;
+  nombreCompleto: string;
+  local: string;
+  almacen: string;
+  materiales: Material[];
+}
+
+export interface Material {
+  id: number;
+  material: string;
+  descripcion: string;
+  cantidad: number;
+  // Agrega otros campos según necesites
+}
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +27,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string) {
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.http.post(`${this.apiUrl}/login`, { username, password }, {
-      headers,
-      responseType: 'text' // <-- Esto es clave para aceptar respuestas de texto
-    });
+  login(username: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${this.apiUrl}/login`, 
+      { username, password }
+    );
   }
 }
